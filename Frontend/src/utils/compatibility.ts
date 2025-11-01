@@ -259,28 +259,28 @@ function scoreStudyWork(s1: string, s2: string): number {
  */
 function scoreACPreference(a1: string, a2: string): number {
   const scores: Record<string, Record<string, number>> = {
-    "Cool (below 68°F)": {
-      "Cool (below 68°F)": 100,
-      "Moderate (68-72°F)": 70,
-      "Warm (above 72°F)": 40,
+    "Cool": {
+      "Cool": 100,
+      "Moderate": 70,
+      "Warm": 40,
       "No preference": 80,
     },
-    "Moderate (68-72°F)": {
-      "Cool (below 68°F)": 70,
-      "Moderate (68-72°F)": 100,
-      "Warm (above 72°F)": 70,
+    "Moderate": {
+      "Cool": 70,
+      "Moderate": 100,
+      "Warm": 70,
       "No preference": 90,
     },
-    "Warm (above 72°F)": {
-      "Cool (below 68°F)": 40,
-      "Moderate (68-72°F)": 70,
-      "Warm (above 72°F)": 100,
+    "Warm": {
+      "Cool": 40,
+      "Moderate": 70,
+      "Warm": 100,
       "No preference": 80,
     },
     "No preference": {
-      "Cool (below 68°F)": 80,
-      "Moderate (68-72°F)": 90,
-      "Warm (above 72°F)": 80,
+      "Cool": 80,
+      "Moderate": 90,
+      "Warm": 80,
       "No preference": 100,
     },
   };

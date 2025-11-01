@@ -108,18 +108,19 @@ const Matches = () => {
   const hasPreferences = !!userPreferences;
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 animate-fade-in">
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 rounded-xl bg-primary flex items-center justify-center">
-            <Heart className="h-8 w-8 text-primary-foreground" />
+    <div className="w-full min-h-full animate-fade-in" style={{ backgroundColor: '#002323' }}>
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="flex justify-center mb-4 sm:mb-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-primary flex items-center justify-center">
+              <Heart className="h-8 w-8 sm:h-10 sm:w-10 text-primary-foreground" />
+            </div>
           </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2 sm:mb-4">Your Top Matches</h1>
+          <p className="text-base sm:text-lg text-muted-foreground px-4">
+            Based on your preferences, here are your compatibility scores with sample users
+          </p>
         </div>
-        <h1 className="text-4xl font-bold text-foreground mb-2">Your Top Matches</h1>
-        <p className="text-lg text-muted-foreground">
-          Based on your preferences, here are your compatibility scores with sample users
-        </p>
-      </div>
 
       {/* No Preferences State */}
       {!hasPreferences && (
@@ -134,24 +135,25 @@ const Matches = () => {
 
       {/* Matches Grid */}
       {hasPreferences && displayMatches.length > 0 && (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 pb-4">
           {displayMatches.map((match) => (
           <Card 
             key={match.id} 
             className="backdrop-blur-md bg-card/80 border-2 shadow-[var(--shadow-xl)] hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
           >
             <CardHeader>
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                     <Users className="h-6 w-6 text-primary-foreground" />
                   </div>
                   <CardTitle className="text-xl">{match.name}</CardTitle>
                 </div>
-                <Badge className="bg-primary text-primary-foreground flex items-center gap-1">
-                  <Star className="h-3 w-3 fill-current" />
-                  {match.compatibility}%
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Star className="h-6 w-6 fill-primary text-primary" />
+                  <span className="text-3xl font-bold text-primary">{match.compatibility}%</span>
+                  <span className="text-sm text-muted-foreground">Match</span>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -171,17 +173,23 @@ const Matches = () => {
               <Button 
                 className="w-full" 
                 variant="default"
-                onClick={() => navigate(`/match/${match.id}`, { 
-                  state: { 
-                    match: {
-                      id: match.id,
-                      name: match.name,
-                      compatibility: match.compatibility,
-                      matchingPreferences: match.matchingPreferences,
-                      bio: match.bio,
-                    }
-                  } 
-                })}
+                onClick={() => {
+                  const sampleUser = SAMPLE_USERS.find(u => u.id === match.id);
+                  navigate(`/match/${match.id}`, { 
+                    state: { 
+                      match: {
+                        id: match.id,
+                        name: match.name,
+                        compatibility: match.compatibility,
+                        matchingPreferences: match.matchingPreferences,
+                        bio: match.bio,
+                        breakdown: match.breakdown,
+                        sampleUserPreferences: sampleUser?.preferences,
+                        userPreferences: userPreferences,
+                      }
+                    } 
+                  });
+                }}
               >
                 View Profile
               </Button>
@@ -190,6 +198,7 @@ const Matches = () => {
         ))}
         </div>
       )}
+      </div>
     </div>
   );
 };

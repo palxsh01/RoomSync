@@ -34,57 +34,59 @@ const Index = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-[image:var(--gradient-hero)]">
+    <div className={`flex flex-col ${hasCompletedQuestionnaire ? 'min-h-screen' : 'h-screen overflow-hidden'} ${hasCompletedQuestionnaire ? '' : 'bg-[image:var(--gradient-hero)]'}`}>
       <Header />
       
-      <main className="flex-1 flex items-center justify-center px-6 overflow-y-auto">
+      <main className={`flex-1 ${hasCompletedQuestionnaire ? 'overflow-y-auto' : 'flex items-center justify-center overflow-y-auto'} ${hasCompletedQuestionnaire ? '' : 'px-6'}`}>
         {showQuestionnaire ? (
-          <Questionnaire onComplete={handleQuestionnaireComplete} />
+          <div className="w-full py-6">
+            <Questionnaire onComplete={handleQuestionnaireComplete} />
+          </div>
         ) : hasCompletedQuestionnaire ? (
           <Matches />
         ) : (
-          <div className="text-center max-w-4xl mx-auto space-y-8 animate-fade-in">
-            <div className="flex justify-center mb-6">
+          <div className="text-center max-w-4xl mx-auto space-y-4 animate-fade-in px-6 py-4">
+            <div className="flex justify-center mb-3">
               <div className="relative">
-                <div className="w-24 h-24 rounded-2xl bg-primary flex items-center justify-center shadow-[var(--shadow-xl)]">
-                  <Users className="h-12 w-12 text-primary-foreground" />
+                <div className="w-16 h-16 rounded-xl bg-primary flex items-center justify-center shadow-[var(--shadow-xl)]">
+                  <Users className="h-8 w-8 text-primary-foreground" />
                 </div>
-                <div className="absolute -top-2 -right-2">
-                  <Sparkles className="h-8 w-8 text-primary animate-pulse" />
+                <div className="absolute -top-1 -right-1">
+                  <Sparkles className="h-5 w-5 text-primary animate-pulse" />
                 </div>
               </div>
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
               Welcome to{" "}
               <span className="text-primary">RoomSync</span>
             </h1>
             
-            <p className="text-2xl md:text-3xl text-muted-foreground max-w-3xl mx-auto font-medium">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
               The Best Place to Find Your Future Roommate!
             </p>
 
-            <div className="flex flex-col md:flex-row gap-6 justify-center items-center mt-12">
-              <div className="flex items-center gap-3 text-foreground">
-                <CheckCircle className="h-6 w-6 text-primary" />
-                <span className="text-lg">Smart Matching</span>
+            <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-6">
+              <div className="flex items-center gap-2 text-foreground">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                <span className="text-base">Smart Matching</span>
               </div>
-              <div className="flex items-center gap-3 text-foreground">
-                <CheckCircle className="h-6 w-6 text-primary" />
-                <span className="text-lg">Perfect Compatibility</span>
+              <div className="flex items-center gap-2 text-foreground">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                <span className="text-base">Perfect Compatibility</span>
               </div>
-              <div className="flex items-center gap-3 text-foreground">
-                <CheckCircle className="h-6 w-6 text-primary" />
-                <span className="text-lg">Easy Process</span>
+              <div className="flex items-center gap-2 text-foreground">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                <span className="text-base">Easy Process</span>
               </div>
             </div>
 
-            <div className="mt-12">
+            <div className="mt-6">
               <Button
                 variant="hero"
-                size="lg"
+                size="default"
                 onClick={handleGetStarted}
-                className="text-lg px-12 py-6 h-auto"
+                className="text-base px-8 py-3"
               >
                 Get Started
               </Button>

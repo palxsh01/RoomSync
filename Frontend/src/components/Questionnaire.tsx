@@ -47,7 +47,7 @@ const questions: Question[] = [
   {
     id: "ac_preference",
     question: "What's your AC/temperature preference?",
-    options: ["Cool (below 68°F)", "Moderate (68-72°F)", "Warm (above 72°F)", "No preference"],
+    options: ["Cool", "Moderate", "Warm", "No preference"],
   },
   {
     id: "roommate_count",
