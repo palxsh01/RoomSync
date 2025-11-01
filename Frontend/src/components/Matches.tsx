@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Heart, Star } from "lucide-react";
+import { Users, Zap, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { SAMPLE_USERS } from "@/data/sampleUsers";
@@ -113,7 +113,7 @@ const Matches = () => {
         <div className="text-center mb-8 sm:mb-12">
           <div className="flex justify-center mb-4 sm:mb-6">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-primary flex items-center justify-center">
-              <Heart className="h-8 w-8 sm:h-10 sm:w-10 text-primary-foreground" />
+              <Zap className="h-8 w-8 sm:h-10 sm:w-10 text-primary-foreground" />
             </div>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2 sm:mb-4">Your Top Matches</h1>
