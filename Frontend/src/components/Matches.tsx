@@ -10,21 +10,21 @@ const Matches = () => {
   const matches = [
     {
       id: 1,
-      name: "Alex Johnson",
+      name: "Utkersh Sharma",
       compatibility: 95,
       matchingPreferences: ["Very tidy", "Early bird", "Prefer quiet environment"],
       bio: "Computer Science major, loves reading and hiking"
     },
     {
       id: 2,
-      name: "Sam Taylor",
+      name: "Rishita Khetan",
       compatibility: 88,
       matchingPreferences: ["Moderately clean", "Flexible", "Moderate noise is fine"],
       bio: "Business student, enjoys cooking and playing guitar"
     },
     {
       id: 3,
-      name: "Jordan Lee",
+      name: "Tanishka Saxena",
       compatibility: 82,
       matchingPreferences: ["Very tidy", "Night owl", "Prefer quiet environment"],
       bio: "Engineering student, passionate about sports and technology"
