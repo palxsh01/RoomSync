@@ -77,7 +77,8 @@ const Questionnaire = ({ onComplete }: QuestionnaireProps) => {
   };
 
   const handleNext = () => {
-    if (!answers[questions[currentQuestion].id]) {
+    const currentAnswer = answers[questions[currentQuestion].id];
+    if (!currentAnswer) {
       toast({
         title: "Please select an option",
         description: "You must select an answer before proceeding.",
@@ -89,8 +90,9 @@ const Questionnaire = ({ onComplete }: QuestionnaireProps) => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      // Save answers to localStorage
-      localStorage.setItem('roommate_preferences', JSON.stringify(answers));
+      // Ensure we have the latest answers before saving
+      const finalAnswers = { ...answers, [questions[currentQuestion].id]: currentAnswer };
+      localStorage.setItem('roommate_preferences', JSON.stringify(finalAnswers));
       toast({
         title: "Preferences saved!",
         description: "Your roommate preferences have been recorded successfully.",

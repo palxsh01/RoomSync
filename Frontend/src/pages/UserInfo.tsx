@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { User, Phone, Mail, Edit } from "lucide-react";
+import { User, Phone, Mail, Edit, Trash2 } from "lucide-react";
 
 const UserInfo = () => {
   const navigate = useNavigate();
@@ -54,6 +54,15 @@ const UserInfo = () => {
 
   const handleEdit = () => {
     setIsEditing(true);
+  };
+
+  const handleClearPreferences = () => {
+    localStorage.removeItem('roommate_preferences');
+    toast({
+      title: "Preferences cleared!",
+      description: "Your roommate preferences have been reset.",
+    });
+    navigate('/');
   };
 
   const questionLabels: Record<string, string> = {
@@ -156,15 +165,26 @@ const UserInfo = () => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-2xl">Your Roommate Preferences</CardTitle>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigate('/?edit=true')}
-                    className="flex items-center gap-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Edit Preferences
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate('/?edit=true')}
+                      className="flex items-center gap-2"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Edit Preferences
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={handleClearPreferences}
+                      className="flex items-center gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Clear Preferences
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
