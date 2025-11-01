@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSyncUser } from "@/hooks/useUser";
 
 interface Question {
   id: string;
@@ -62,7 +63,9 @@ interface QuestionnaireProps {
 const Questionnaire = ({ onComplete }: QuestionnaireProps) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [isSyncing, setIsSyncing] = useState(false);
   const { toast } = useToast();
+  const syncUser = useSyncUser();
 
   // Load existing answers from localStorage if available
   useEffect(() => {
@@ -76,7 +79,7 @@ const Questionnaire = ({ onComplete }: QuestionnaireProps) => {
     setAnswers({ ...answers, [questions[currentQuestion].id]: value });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const currentAnswer = answers[questions[currentQuestion].id];
     if (!currentAnswer) {
       toast({
@@ -93,10 +96,28 @@ const Questionnaire = ({ onComplete }: QuestionnaireProps) => {
       // Ensure we have the latest answers before saving
       const finalAnswers = { ...answers, [questions[currentQuestion].id]: currentAnswer };
       localStorage.setItem('roommate_preferences', JSON.stringify(finalAnswers));
-      toast({
-        title: "Preferences saved!",
-        description: "Your roommate preferences have been recorded successfully.",
-      });
+      localStorage.setItem('preferences_last_updated', Date.now().toString());
+      
+      // Sync with backend
+      setIsSyncing(true);
+      try {
+        await syncUser.mutateAsync();
+        toast({
+          title: "Preferences saved!",
+          description: "Your roommate preferences have been synced with the backend.",
+        });
+      } catch (error) {
+        toast({
+          title: "Preferences saved locally",
+          description: error instanceof Error 
+            ? `Backend sync failed: ${error.message}` 
+            : "Your preferences are saved but couldn't sync with backend.",
+          variant: "default",
+        });
+      } finally {
+        setIsSyncing(false);
+      }
+      
       onComplete();
     }
   };
@@ -168,8 +189,16 @@ const Questionnaire = ({ onComplete }: QuestionnaireProps) => {
           >
             Previous
           </Button>
-          <Button onClick={handleNext} className="min-w-24">
-            {currentQuestion === questions.length - 1 ? "Finish" : "Next"}
+          <Button 
+            onClick={handleNext} 
+            className="min-w-24"
+            disabled={isSyncing}
+          >
+            {isSyncing 
+              ? "Saving..." 
+              : currentQuestion === questions.length - 1 
+                ? "Finish" 
+                : "Next"}
           </Button>
         </div>
       </Card>

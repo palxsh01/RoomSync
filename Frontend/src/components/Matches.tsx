@@ -3,33 +3,109 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users, Heart, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
+import { SAMPLE_USERS } from "@/data/sampleUsers";
+import { calculateCompatibility, UserPreferences } from "@/utils/compatibility";
+
+interface DisplayMatch {
+  id: number;
+  name: string;
+  compatibility: number;
+  matchingPreferences: string[];
+  bio: string;
+  breakdown: {
+    cleanliness: number;
+    sleep_schedule: number;
+    noise_tolerance: number;
+    guests: number;
+    lifestyle: number;
+    study_work: number;
+    ac_preference: number;
+  };
+}
 
 const Matches = () => {
   const navigate = useNavigate();
-  // Mock matches data - in real app, this would come from backend matching algorithm
-  const matches = [
-    {
-      id: 1,
-      name: "Utkersh Sharma",
-      compatibility: 95,
-      matchingPreferences: ["Very tidy", "Early bird", "Prefer quiet environment"],
-      bio: "Computer Science major, loves reading and hiking"
-    },
-    {
-      id: 2,
-      name: "Rishita Khetan",
-      compatibility: 88,
-      matchingPreferences: ["Moderately clean", "Flexible", "Moderate noise is fine"],
-      bio: "Business student, enjoys cooking and playing guitar"
-    },
-    {
-      id: 3,
-      name: "Tanishka Saxena",
-      compatibility: 82,
-      matchingPreferences: ["Very tidy", "Night owl", "Prefer quiet environment"],
-      bio: "Engineering student, passionate about sports and technology"
+  const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
+
+  // Load user preferences from localStorage
+  useEffect(() => {
+    const loadPreferences = () => {
+      const saved = localStorage.getItem('roommate_preferences');
+      if (saved) {
+        try {
+          const prefs = JSON.parse(saved) as UserPreferences;
+          setUserPreferences(prefs);
+        } catch (error) {
+          console.error('Failed to parse preferences:', error);
+        }
+      }
+    };
+
+    loadPreferences();
+
+    // Listen for storage changes (e.g., when questionnaire is completed)
+    const handleStorageChange = () => {
+      loadPreferences();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically for same-tab updates
+    const interval = setInterval(() => {
+      loadPreferences();
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Calculate matches against sample users
+  const displayMatches = useMemo(() => {
+    if (!userPreferences) {
+      return [];
     }
-  ];
+
+    const matches: DisplayMatch[] = SAMPLE_USERS.map((sampleUser) => {
+      const compatibility = calculateCompatibility(userPreferences, sampleUser.preferences);
+      
+      // Extract top matching preferences from breakdown
+      const preferences = Object.entries(compatibility.breakdown)
+        .sort(([, a], [, b]) => b - a) // Sort by score descending
+        .slice(0, 3) // Get top 3
+        .map(([key, value]) => {
+          // Format the key to readable text
+          const labels: Record<string, string> = {
+            cleanliness: 'Cleanliness',
+            sleep_schedule: 'Sleep Schedule',
+            noise_tolerance: 'Noise Tolerance',
+            guests: 'Guests',
+            lifestyle: 'Lifestyle',
+            study_work: 'Study/Work',
+            ac_preference: 'AC Preference',
+          };
+          return `${labels[key] || key}: ${value}%`;
+        });
+
+      return {
+        id: sampleUser.id,
+        name: sampleUser.name,
+        compatibility: compatibility.percentage,
+        matchingPreferences: preferences.length > 0 
+          ? preferences 
+          : ['Compatibility calculated'],
+        bio: sampleUser.bio,
+        breakdown: compatibility.breakdown,
+      };
+    });
+
+    // Sort by compatibility (highest first)
+    return matches.sort((a, b) => b.compatibility - a.compatibility);
+  }, [userPreferences]);
+
+  const hasPreferences = !!userPreferences;
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6 animate-fade-in">
@@ -41,12 +117,25 @@ const Matches = () => {
         </div>
         <h1 className="text-4xl font-bold text-foreground mb-2">Your Top Matches</h1>
         <p className="text-lg text-muted-foreground">
-          Based on your preferences, here are your best roommate matches
+          Based on your preferences, here are your compatibility scores with sample users
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {matches.map((match) => (
+      {/* No Preferences State */}
+      {!hasPreferences && (
+        <div className="flex flex-col items-center justify-center py-12">
+          <Users className="h-12 w-12 text-muted-foreground mb-4" />
+          <p className="text-lg font-semibold text-foreground mb-2">Complete Questionnaire First</p>
+          <p className="text-sm text-muted-foreground text-center max-w-md">
+            Please complete the questionnaire to see your compatibility matches with sample users.
+          </p>
+        </div>
+      )}
+
+      {/* Matches Grid */}
+      {hasPreferences && displayMatches.length > 0 && (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {displayMatches.map((match) => (
           <Card 
             key={match.id} 
             className="backdrop-blur-md bg-card/80 border-2 shadow-[var(--shadow-xl)] hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
@@ -69,7 +158,7 @@ const Matches = () => {
               <p className="text-sm text-muted-foreground">{match.bio}</p>
               
               <div>
-                <h4 className="text-sm font-semibold mb-2 text-foreground">Matching Preferences:</h4>
+                <h4 className="text-sm font-semibold mb-2 text-foreground">Top Compatibility Factors:</h4>
                 <div className="flex flex-wrap gap-2">
                   {match.matchingPreferences.map((pref, idx) => (
                     <Badge key={idx} variant="secondary" className="text-xs">
@@ -82,14 +171,25 @@ const Matches = () => {
               <Button 
                 className="w-full" 
                 variant="default"
-                onClick={() => navigate(`/match/${match.id}`, { state: { match } })}
+                onClick={() => navigate(`/match/${match.id}`, { 
+                  state: { 
+                    match: {
+                      id: match.id,
+                      name: match.name,
+                      compatibility: match.compatibility,
+                      matchingPreferences: match.matchingPreferences,
+                      bio: match.bio,
+                    }
+                  } 
+                })}
               >
                 View Profile
               </Button>
             </CardContent>
           </Card>
         ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

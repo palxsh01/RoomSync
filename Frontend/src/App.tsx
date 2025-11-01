@@ -9,7 +9,18 @@ import UserInfo from "./pages/UserInfo";
 import MatchProfile from "./pages/MatchProfile";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Refetch on window focus to get latest data
+      refetchOnWindowFocus: true,
+      // Retry failed requests
+      retry: 1,
+      // Consider data stale after 10 seconds (for matches)
+      staleTime: 10000,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
